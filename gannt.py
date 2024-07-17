@@ -14,7 +14,7 @@ df['结束时间'] = pd.to_datetime(df['结束时间'], format='%Y%m%d')
 df['模块'] = df['模块'].ffill()
 
 # 生成自定义的x轴标签
-x_ticks = pd.date_range(start=df['开始时间'].min(), end=df['结束时间'].max(), freq='M')
+x_ticks = pd.date_range(start=df['开始时间'].min(), end=df['结束时间'].max(), freq='MS')
 x_labels = []
 previous_year = None
 
@@ -77,6 +77,7 @@ for module in df['模块'].unique():
     module_tasks = df[df['模块'] == module]
     module_end = module_tasks['结束时间'].max()
     module_text = module.replace('\n', '<br>')  # 确保显示换行符
+    print(module_text, module_end)
     fig.add_annotation(
         x=module_end,
         y=-0.01,  # 向 y 轴负方向移动 0.01
@@ -99,9 +100,11 @@ for module in df['模块'].unique():
 # 获取每个模块的起始和结束位置
 module_end_positions = df.groupby('模块').apply(lambda x: x.index[-1]).tolist()
 
-# 添加每个模块的横向分割线
+for i in range(16):
+    fig.add_hline(y=i-0.5, line_width=0.5, line_dash="dash", line_color="LightSalmon")
 for end_pos in module_end_positions:
-    fig.add_hline(y=end_pos - 0.5, line_width=2, line_dash="dash", line_color="LightSalmon")
+    y = len(df) - 1 - end_pos - 0.5
+    fig.add_hline(y=y, line_width=2, line_dash="dash", line_color="LightSalmon")
 
 
 # 将图表保存为 HTML 文件
